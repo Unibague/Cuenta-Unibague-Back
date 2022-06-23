@@ -22,4 +22,4 @@ $router->get('/', function () use ($router) {
 });
 
 
-$router->get('/changePassword', 'AccountController@changePassword');
+$router->post('/changePassword', 'AccountController@changePassword');
