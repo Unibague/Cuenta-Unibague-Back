@@ -2,24 +2,14 @@
 
 /** @var \Laravel\Lumen\Routing\Router $router */
 
-/*
-|--------------------------------------------------------------------------
-| Application Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register all of the routes for an application.
-| It is a breeze. Simply tell Lumen the URIs it should respond to
-| and give it the Closure to call when that URI is requested.
-|
-*/
-
 use App\Helpers\LDAPH\EasyLDAP;
 
 $router->get('/', function () use ($router) {
-
     return 'Hola';
-
 });
 
-
 $router->post('/changePassword', 'AccountController@changePassword');
+$router->post('/rememberEmail', 'AccountController@rememberEmail');
+$router->post('/recoverPassword', 'AccountController@recoverPassword');
+$router->post('/changeAlternateEmail', 'AccountController@changeAlternateEmail');
+
