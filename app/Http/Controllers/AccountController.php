@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\CurlCobain;
 use App\Helpers\LDAPH\EasyLDAP;
+use App\Models\PasswordChangeRequest;
 use Illuminate\Http\Request;
 
 class AccountController extends Controller
@@ -58,7 +59,7 @@ class AccountController extends Controller
             'account' => $request->input('email'),
             'password' => $request->input('password'),
             'alterno' => $request->input('alternateEmail'),
-            'token' => md5( $request->input('email') )."YHyd?B'r8R7ejTRN"
+            'token' => md5($request->input('email')) . "YHyd?B'r8R7ejTRN"
         ]);
 
         $answer = $curl->makeRequest();
@@ -72,10 +73,10 @@ class AccountController extends Controller
     }
 
 
-
     /**
      * @throws \Illuminate\Validation\ValidationException
      * @throws \JsonException
+     * @throws \Exception
      */
     public function recoverPassword(Request $request)
     {
@@ -108,6 +109,17 @@ class AccountController extends Controller
             $user = substr_replace($user, $hidden, 2, $userLength - 4);
         }
 
+        $token = bin2hex(random_bytes(30));
+
+        PasswordChangeRequest::create([
+            'email' => $request->input('email'),
+            'alternateEmail' => $email,
+            'isActive' => true,
+            'token' => $token
+        ]);
+
+        \Illuminate\Support\Facades\Mail::to($email)->send(new \App\Mail\RecoverPassword($token));
+
         return response()->json(['message' => 'Hemos enviado un enlace de recuperación de contraseña a tu correo alterno registrado: ' . "$user@$domain"]);
     }
 
@@ -120,7 +132,6 @@ class AccountController extends Controller
             'confirmNewPassword' => 'required|same:newPassword',
             'role' => 'required|numeric'
         ]);
-
 
         $easyLDAP = new EasyLDAP(false);
 
@@ -151,9 +162,9 @@ class AccountController extends Controller
         $modify = $easyLDAP->modify($result['dn'], $modifiedAttributes);
         if ($modify === true) {
             return response()->json(['message' => 'Tu contraseña ha sido cambiada exitosamente'], 200);
-        } else {
-            return response()->json(['message' => 'Ha ocurrido un error interno, por favor intentalo mas tarde'], 500);
         }
+
+        return response()->json(['message' => 'Ha ocurrido un error interno, por favor intentalo mas tarde'], 500);
 
     }
 
