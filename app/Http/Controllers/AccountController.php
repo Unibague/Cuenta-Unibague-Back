@@ -12,6 +12,11 @@ use Illuminate\Validation\ValidationException;
 class AccountController extends Controller
 {
 
+    private $roles = [
+        0 => '@estudiantesunibague.edu.co',
+        1 => '@unibague.edu.co'
+    ];
+
     /**
      * @throws \Illuminate\Validation\ValidationException
      * @throws \JsonException
@@ -60,10 +65,11 @@ class AccountController extends Controller
                 'confirmAlternateEmail' => 'required|same:alternateEmail',
             ]);
         } catch (ValidationException $e) {
-            return response()->json(['message' => 'Por favor, ingresa todos los datos del formulario'], 404);
+            return response()->json(['message' => 'Por favor, revisa los datos del formulario'], 404);
         }
-
-        $email = $request->input('user') . ($request->input('role') === 0 ? '@estudiantesunibague.edu.co' : '@unibague.edu.co');
+        //Get email by role
+        $email = $request->input('user') . $this->getEmailExtension($request->input('role'));
+        //Make request
         $curl = new CurlCobain('https://academia.unibague.edu.co/atlante/actualiza_alterno.php');
         $curl->setQueryParamsAsArray([
             'consulta' => 'Consultar',
@@ -91,15 +97,21 @@ class AccountController extends Controller
      */
     public function recoverPassword(Request $request): \Illuminate\Http\JsonResponse
     {
-        $this->validate($request, [
-            'email' => 'required|email',
-        ]);
+        try {
+            $this->validate($request, [
+                'user' => 'required',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json(['message' => 'Por favor, revisa los datos del formulario'], 404);
+        }
+        //Get email by role
+        $userEmail = $request->input('user') . $this->getEmailExtension($request->input('role'));
 
-
+        //Make request
         $curl = new CurlCobain('https://academia.unibague.edu.co/atlante/recordar_alterno.php');
         $curl->setQueryParamsAsArray([
             'consulta' => 'Consultar',
-            'correo' => $request->email,
+            'correo' => $userEmail,
         ]);
 
         $answer = $curl->makeRequest();
@@ -123,7 +135,7 @@ class AccountController extends Controller
         $token = bin2hex(random_bytes(30));
 
         PasswordChangeRequest::create([
-            'email' => $request->input('email'),
+            'email' => $userEmail,
             'alternateEmail' => $email,
             'isActive' => true,
             'token' => $token
@@ -132,6 +144,11 @@ class AccountController extends Controller
         \Illuminate\Support\Facades\Mail::to($email)->send(new \App\Mail\RecoverPassword($token));
 
         return response()->json(['message' => 'Hemos enviado un enlace de recuperación de contraseña a tu correo alterno registrado: ' . "$user@$domain"]);
+    }
+
+    public function getEmailExtension(int $role): string
+    {
+        return $this->roles[$role];
     }
 
     /**
