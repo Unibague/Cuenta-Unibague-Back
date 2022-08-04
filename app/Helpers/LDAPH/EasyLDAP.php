@@ -24,7 +24,7 @@ class EasyLDAP
     /**
      * @var string
      */
-    private $password = 'p4q71t4$2015';
+    private $password = '';
     /**
      * @var false|resource
      */
@@ -40,6 +40,10 @@ class EasyLDAP
      */
     public function __construct(bool $asAdmin = true)
     {
+        $this->host = env('LDAP_HOST','172.19.18.10');
+        $this->password = env('LDAP_PASSWORD','');
+        $this->port = env('LDAP_PORT',389);
+
         $this->connection = ldap_connect($this->host, $this->port);
         //Configure required options
         $this->configure();

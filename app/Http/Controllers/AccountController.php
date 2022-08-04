@@ -26,6 +26,7 @@ class AccountController extends Controller
         $this->validate($request, [
             'documentNumber' => 'required|string',
             'birthday' => 'required',
+            'role' => 'required|numeric'
         ]);
 
         [$year, $month, $day] = explode('-', $request->birthday);
@@ -43,9 +44,22 @@ class AccountController extends Controller
         $answerAsObject = json_decode($answer, true, 512, JSON_THROW_ON_ERROR);
 
         if (isset($answerAsObject['error'])) {
-            return response()->json(['message' => 'Los datos ingresados no coinciden con nuestro registro. Verifica la información suministrada en el formulario'], 404);
+            return response()->json(['message' => 'Los datos ingresados no coinciden con nuestro registro. Por favor, verifica la información suministrada en el formulario'], 404);
         }
-        $user = explode('@', $answerAsObject[0]['cod_usuario'])[0];
+
+        //There is an anwers, lets get the email dependending on the role.
+        $email = '';
+        foreach ($answerAsObject as $possibleEmail) {
+            if (str_contains($possibleEmail['dir_email'], $this->getEmailExtension($request->input('role')))) {
+                $email = $possibleEmail['dir_email'];
+            }
+        }
+
+        if ($email === '') {
+            return response()->json(['message' => 'Ha ocurrido un error interno, por favor, comunicate con g3@unibague.edu.co y reporta el caso'], 500);
+        }
+
+        $user = explode('@', $email)[0];
         return response()->json(['message' => 'Tu usuario Unibagué es: ' . $user]);
     }
 
@@ -120,7 +134,7 @@ class AccountController extends Controller
         if (isset($answerAsObject['error'])) {
             return response()->json(['message' => $answerAsObject['error']], 404);
         }
-        $email = $answerAsObject[0]['correo_altero'];
+        $email = $answerAsObject['correo_altero'];
         [$user, $domain] = explode('@', $email);
 
         $userLength = strlen($user);
@@ -208,7 +222,7 @@ class AccountController extends Controller
             }
             //The code is not active
             if ($passwordChangeRequest->isActive === 0) {
-                return response()->json(['message' => 'El código que ingresaste ya ha expirado o ha sido usado'], 400);
+                return response()->json(['message' => 'El código que ingresaste ya ha expirado o ha sido usado previamente'], 400);
             }
             //The code is active, proceed with password change
             $user = explode('@', $passwordChangeRequest->email)[0];
