@@ -155,7 +155,11 @@ class AccountController extends Controller
             'token' => $token
         ]);
 
-        \Illuminate\Support\Facades\Mail::to($email)->send(new \App\Mail\RecoverPassword($token));
+        try {
+            \Illuminate\Support\Facades\Mail::to($email)->send(new \App\Mail\RecoverPassword($token));
+        } catch (\Exception $e) {
+            response()->json(['message' => 'Error enviando email :' . $e->getMessage()]);
+        }
 
         return response()->json(['message' => 'Hemos enviado un enlace de recuperación de contraseña a tu correo alterno registrado: ' . "$user@$domain"]);
     }
