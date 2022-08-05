@@ -9,7 +9,7 @@ Este mensaje fue generado automáticamente por la plataforma cuenta.unibague.edu
 Cordialmente,
 
 Universidad de Ibagué
-@component('mail::button', ['url' => 'http://localhost:8080/change-password?token='.$token])
+@component('mail::button', ['url' => env('APP_URL').'/change-password?token='.$token])
 Recuperar contraseña
 @endcomponent
 
