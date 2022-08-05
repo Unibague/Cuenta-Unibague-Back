@@ -7,6 +7,7 @@ use App\Helpers\LDAPH\EasyLDAP;
 use App\Http\Requests\VerifyTokenRequest;
 use App\Models\PasswordChangeRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 
 class AccountController extends Controller
@@ -156,7 +157,7 @@ class AccountController extends Controller
         ]);
 
         try {
-            \Illuminate\Support\Facades\Mail::to($email)->send(new \App\Mail\RecoverPassword($token));
+            Mail::to($email)->send(new \App\Mail\RecoverPassword($token));
         } catch (\Exception $e) {
             response()->json(['message' => 'Error enviando email :' . $e->getMessage()]);
         }

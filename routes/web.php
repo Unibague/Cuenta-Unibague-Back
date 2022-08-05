@@ -11,9 +11,7 @@ $router->get('/', function () use ($router) {
 
 $router->get('/test', function () use ($router) {
 
-    dd(\App\Models\PasswordChangeRequest::all());
-    die();
-    \Illuminate\Support\Facades\Mail::to('juan.ospina@unibague.edu.co')->send(new \App\Mail\RecoverPassword());
+    \Illuminate\Support\Facades\Mail::to('juan.ospina@unibague.edu.co')->send(new \App\Mail\RecoverPassword('token'));
 });
 
 //Change password router
