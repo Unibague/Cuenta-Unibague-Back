@@ -47,7 +47,7 @@ class AccountController extends Controller
         if (isset($answerAsObject['error'])) {
             //Check if the email is not found
             if ($answerAsObject['error'] === "Sin datos en correo") {
-                return redirect('https://forms.gle/7qC6tYM5ZCQBSxkw8');
+                return response()->json(['redirect' => 'https://forms.gle/7qC6tYM5ZCQBSxkw8'], 302);
             }
             return response()->json(['message' => 'Los datos ingresados no coinciden con nuestro registro. Por favor, verifica la información suministrada en el formulario'], 404);
         }
