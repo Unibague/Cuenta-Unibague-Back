@@ -49,7 +49,8 @@ class AccountController extends Controller
             if ($answerAsObject['error'] === "Sin datos en correo") {
                 return response()->json(['redirect' => 'https://forms.gle/7qC6tYM5ZCQBSxkw8'], 404);
             }
-            return response()->json(['message' => 'Los datos ingresados no coinciden con nuestro registro. Por favor, verifica la información suministrada en el formulario'], 404);
+            $message = "<span>No encontramos una cuenta asociada a los datos ingresados. Por favor, verifica la información suministrada en el formulario. Si eres un egresado y no tuviste un correo institucional</span><a href='https://forms.gle/8d6McXtCTDSVvtfy5' style='color:blue'> lo puedes solicitar en este enlace.</a>";
+            return response()->json(['message' => $message], 404);
         }
 
         //There is an anwers, lets get the email dependending on the role.
