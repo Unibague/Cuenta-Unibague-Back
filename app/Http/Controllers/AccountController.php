@@ -49,7 +49,7 @@ class AccountController extends Controller
             if ($answerAsObject['error'] === "Sin datos en correo") {
                 return response()->json(['redirect' => 'https://forms.gle/7qC6tYM5ZCQBSxkw8'], 404);
             }
-            $message = "<span>No encontramos una cuenta asociada a los datos ingresados. Por favor, verifica la información suministrada en el formulario. Si eres un egresado y no tuviste un correo institucional</span><a href='https://forms.gle/8d6McXtCTDSVvtfy5' style='color:blue'> lo puedes solicitar en este enlace.</a>";
+            $message = "<span>No encontramos una cuenta asociada a los datos ingresados. Por favor, verifica la información suministrada en el formulario. Si eres un graduado y no tuviste un correo institucional</span><a href='https://forms.gle/8d6McXtCTDSVvtfy5' style='color:blue'> lo puedes solicitar en este enlace.</a>";
             return response()->json(['message' => $message], 404);
         }
 
@@ -62,7 +62,7 @@ class AccountController extends Controller
         }
 
         if ($email === '') {
-            return response()->json(['message' => 'Ha ocurrido un error interno, por favor, comunicate con g3@unibague.edu.co y reporta el caso'], 500);
+            return response()->json(['message' => 'Ha ocurrido un error interno, por favor, comunícate con g3@unibague.edu.co y reporta el caso'], 500);
         }
 
         $user = explode('@', $email)[0];
@@ -109,7 +109,6 @@ class AccountController extends Controller
         return response()->json(['message' => 'Estimado usuario, tu correo alterno ha sido actualizado exitosamente']);
     }
 
-
     /**
      * @throws \Illuminate\Validation\ValidationException
      * @throws \JsonException
@@ -124,6 +123,7 @@ class AccountController extends Controller
         } catch (ValidationException $e) {
             return response()->json(['message' => 'Por favor, revisa los datos del formulario'], 404);
         }
+
         //Get email by role
         $userEmail = $request->input('user') . $this->getEmailExtension($request->input('role'));
 
