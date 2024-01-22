@@ -151,7 +151,6 @@ class AccountController extends Controller
             $hidden = str_repeat('*', $userLength - 4);
             $user = substr_replace($user, $hidden, 2, $userLength - 4);
         }
-
         $token = bin2hex(random_bytes(30));
 
         PasswordChangeRequest::create([
@@ -183,12 +182,16 @@ class AccountController extends Controller
         $this->validate($request, [
             'token' => 'required'
         ]);
-
         $changePasswordRequest = PasswordChangeRequest::where('token', '=', $request->input('token'))->latest()->first();
+
+        dd($changePasswordRequest);
+
+
         if (!$changePasswordRequest) {
             return response('', 404);
         }
         if ($changePasswordRequest->isActive === 1) {
+
             return response('', 200);
         }
         return response('', 404);
