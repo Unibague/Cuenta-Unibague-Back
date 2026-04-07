@@ -135,7 +135,11 @@ class AccountController extends Controller
         ]);
 
         $answer = $curl->makeRequest();
-        $answerAsObject = json_decode($answer, true, 512, JSON_THROW_ON_ERROR);
+        $answerAsObject = json_decode($answer, true, 512);
+
+        if (json_last_error() !== JSON_ERROR_NONE || !is_array($answerAsObject)) {
+            return response()->json(['message' => 'Error al consultar el servicio externo, intenta más tarde'], 502);
+        }
 
         if (isset($answerAsObject['error'])) {
             return response()->json(['message' => $answerAsObject['error']], 404);
